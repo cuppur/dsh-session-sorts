@@ -1,0 +1,5 @@
+# DSH session sorts bundle; keep the legacy configuration identity.
+- insert:
+    - id: workspace-groups
+      name: 'dsh-session-sorts'
+      config: {}

@@ -1,0 +1,74 @@
+{
+  "name": "dsh-session-sorts",
+  "version": "0.1.0",
+  "description": "DSH session sorts — DSH 0.2.1-rc.2 workspace groups compatibility edition; preserves grouping, ordering, search and isolated sidecars.",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "deepseek-harness-plugin",
+    "dsh-plugin",
+    "plugin",
+    "sidebar",
+    "workspace",
+    "workspace-groups",
+    "client-plugin"
+  ],
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuppur/dsh-session-sorts.git"
+  },
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20",
+    "dsh": "0.2.1-rc.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "node adapt.mjs",
+    "check": "node --check lib/index.js && node --check lib/client.js",
+    "test": "node tests/offline.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-client-ui-workspace": "0.2.1-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "0.2.1-rc.2",
+    "react": "^18.2.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.2"
+  },
+  "displayName": "DSH session sorts",
+  "homepage": "https://github.com/cuppur/dsh-session-sorts#readme",
+  "bugs": {
+    "url": "https://github.com/cuppur/dsh-session-sorts/issues"
+  }
+}
