@@ -66,7 +66,8 @@ await check('Adapted client factory loads using DSH 0.2 shell seed names', async
   const manifest = JSON.parse(await read('package.json'));
   assert.equal(manifest.name, 'dsh-session-sorts');
   assert.equal(manifest.displayName, 'DSH session sorts');
-  assert.equal(manifest.engines.dsh, '0.2.1-rc.2');
+  assert.equal(manifest.engines.dsh, '>=0.2.1-rc.2 <0.3.0');
+  assert.equal(manifest.version, '0.1.1');
   assert.match(await read('cordis.patch.yml'), /id: workspace-groups/);
   assert.match(await read('cordis.patch.yml'), /name: 'dsh-session-sorts'/);
   assert(!clientText.includes('@deepseek-ai/dsh-client-runtime'));
@@ -222,11 +223,19 @@ await check('Host boundary rejects malformed JSON, unknown category and oversize
  assert.equal((await request('/workspace-groups/config','POST')).status,405);
  const head=await request('/workspace-groups/config','HEAD');assert.equal(head.status,200);assert.equal(head.body,undefined);
 });
-await hostCheck('Current host compatibility preflight accepts unchanged profile-free candidate manifest',async()=>{
+await hostCheck('Current host compatibility preflight accepts the ranged manifest on this runtime',async()=>{
  const pkg=JSON.parse(await read('package.json'));
  const appBoot=await import(new URL('node_modules/@deepseek-ai/dsh-app-boot/lib/index.js',hostURL));
- assert.equal(appBoot.evaluatePluginCompatibility(pkg,{},'0.2.1-rc.2'),undefined);
+ const hostVersion=JSON.parse(await upstream('dsh-app-boot/package.json')).version;
+ assert.equal(appBoot.evaluatePluginCompatibility(pkg,{},hostVersion),undefined);
+ // The range must accept the whole 0.2.1 prerelease line and still reject older and newer lines.
+ for(const accepted of ['0.2.1-rc.2','0.2.1-rc.3','0.2.1','0.2.9']) assert.equal(appBoot.evaluatePluginCompatibility(pkg,{},accepted),undefined);
+ for(const rejected of ['0.2.0','0.2.1-rc.1','0.3.0','0.1.9']){
+  const issue=appBoot.evaluatePluginCompatibility(pkg,{},rejected);
+  assert(issue!==undefined,`expected ${rejected} to be rejected`);
+  assert.deepEqual(Object.keys(issue.requirements),['engines.dsh']);
+ }
 });
 const hashes={};for(const p of ['tests/fixtures/upstream/lib/client.js','tests/fixtures/upstream/lib/index.js','lib/client.js','lib/index.js']) hashes[p]=createHash('sha256').update(await read(p)).digest('hex');
-await writeFile(new URL('out/test-results.json',root),JSON.stringify({timestamp:new Date().toISOString(),node:process.version,host:host ? 'installed DSH 0.2.1-rc.2 (path omitted)' : null,tests:evidence,hashes,limitations:['No real browser DOM or interaction/render validation','No profile changes, plugin enable, reload, restart or real user data access','UI handler tests use deterministic React hook fixtures; host routes use Node streams and fixture sidecars']},null,2)+'\n');
+await writeFile(new URL('out/test-results.json',root),JSON.stringify({timestamp:new Date().toISOString(),node:process.version,host:host ? `installed DSH ${JSON.parse(await upstream('dsh-app-boot/package.json')).version} (path omitted)` : null,tests:evidence,hashes,limitations:['No real browser DOM or interaction/render validation','No profile changes, plugin enable, reload, restart or real user data access','UI handler tests use deterministic React hook fixtures; host routes use Node streams and fixture sidecars']},null,2)+'\n');
 console.log(`Completed ${evidence.length} checks. Evidence: out/test-results.json`);

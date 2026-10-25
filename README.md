@@ -1,6 +1,19 @@
 # DSH session sorts
 
-适配 **DSH 0.2.1-rc.2** 的轻量会话分组侧栏插件，npm 包名与客户端模块 ID 为 `dsh-session-sorts`。
+适配 **DSH 0.2.1 系列（rc.2、rc.3 及后续 rc.x）** 的轻量会话分组侧栏插件，npm 包名与客户端模块 ID 为 `dsh-session-sorts`。
+
+## 兼容范围
+
+`engines.dsh` 声明为范围 `>=0.2.1-rc.2 <0.3.0`（宿主按 semver + `includePrerelease` 判定）：
+
+| 宿主版本 | 结果 |
+| --- | --- |
+| `0.2.1-rc.2` | 通过 |
+| `0.2.1-rc.3` | 通过（0.1.1 起；0.1.0 因精确 pin 被宿主判定 `incompatible-version`） |
+| `0.2.1` / `0.2.x` | 通过 |
+| `0.2.0`、`0.3.0+` | 拒绝，需要重新适配 |
+
+0.1.0 把 `engines.dsh` 写死成 `0.2.1-rc.2`，升级到 rc.3 后宿主 preflight 直接拒载（插件页显示"异常"）。0.1.1 只把版本声明改为范围并重跑全部 13 项离线检查（其中 3 项针对真实 0.2.1-rc.3 安装目录），运行时代码未改动。
 
 本项目 fork / 派生自 [z-col/dsh-workspace-groups](https://github.com/z-col/dsh-workspace-groups)，保留原作者 zcol 的 MIT 许可与署名。本次适配基于原项目已发布 JavaScript 产物，不声称持有或重建上游完整 TypeScript 工程。
 
@@ -42,7 +55,7 @@ categories:
 
 ## 从源码复现
 
-运行包要求 Node >=20；本仓库离线测试使用 `node:module.registerHooks`，测试工具要求 **Node >=22.15（推荐 Node 24+）**。宿主相关测试需一份 DSH **0.2.1-rc.2** 安装目录，仅作只读验证。
+运行包要求 Node >=20；本仓库离线测试使用 `node:module.registerHooks`，测试工具要求 **Node >=22.15（推荐 Node 24+）**。宿主相关测试需一份 DSH **0.2.1-rc.2 或更高 rc.x** 安装目录，仅作只读验证。
 
 ```sh
 # 不自动安装 DSH peer packages；它们由实际宿主提供。
@@ -75,7 +88,7 @@ npm test
 
 ## 验证状态与限制
 
-在 DSH 0.2.1-rc.2 文件上，13 项离线检查通过；真实 ClientModuleSystem 和 seed 导出表亦已检查。13 项包括调用原 UI handlers 与合成 drop events 的逻辑回归，不等于浏览器交互验收。
+在 DSH 0.2.1-rc.3 文件上，13 项离线检查通过（含宿主 preflight 对 `0.2.1-rc.2`／`0.2.1-rc.3`／`0.2.9` 放行、对 `0.2.0`／`0.2.1-rc.1`／`0.3.0` 拒绝的正反用例）；真实 ClientModuleSystem 和 seed 导出表亦已检查。13 项包括调用原 UI handlers 与合成 drop events 的逻辑回归，不等于浏览器交互验收。
 
 **真实 GUI 验收仍待进行**：实际 Cordis boot、DOM / React 布局、鼠标拖放、原生目录选择、真实会话操作、HMR / 重连、多窗口并发与长列表性能均未在此发布中验证。没有宣称真实 GUI 已可用，也没有 RAM / CPU / 启动时间 benchmark。
 

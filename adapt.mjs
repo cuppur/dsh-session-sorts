@@ -66,12 +66,14 @@ await put('lib/index.js', host);
 const pkg = JSON.parse(await get('tests/fixtures/upstream/package.json'));
 pkg.name = 'dsh-session-sorts';
 pkg.displayName = 'DSH session sorts';
-pkg.version = '0.1.0';
+pkg.version = '0.1.1';
 pkg.repository = { type: 'git', url: 'https://github.com/cuppur/dsh-session-sorts.git' };
 pkg.homepage = 'https://github.com/cuppur/dsh-session-sorts#readme';
 pkg.bugs = { url: 'https://github.com/cuppur/dsh-session-sorts/issues' };
-pkg.description = 'DSH session sorts — DSH 0.2.1-rc.2 workspace groups compatibility edition; preserves grouping, ordering, search and isolated sidecars.';
-pkg.engines.dsh = '0.2.1-rc.2';
+pkg.description = 'DSH session sorts — DSH 0.2.1 (rc.2 and later rc.x) workspace groups compatibility edition; preserves grouping, ordering, search and isolated sidecars.';
+// A range, not an exact pin: the whole 0.2.1 prerelease line shares one client/host API surface,
+// so rc.2 and later rc.x pass the host preflight while 0.3+ stays rejected.
+pkg.engines.dsh = '>=0.2.1-rc.2 <0.3.0';
 delete pkg.types;
 delete pkg.exports['.'].types;
 delete pkg.exports['./client'].types;
@@ -81,8 +83,8 @@ pkg.scripts = { build: 'node adapt.mjs', check: 'node --check lib/index.js && no
 pkg.dsh.client.inject = ['@deepseek-ai/dsh-client-ui-workspace'];
 pkg.peerDependencies = {
   '@deepseek-ai/cordis': '~4.0.5',
-  '@deepseek-ai/dsh-client-ui-workspace': '0.2.1-rc.2',
-  '@deepseek-ai/dsh-host-webserver': '0.2.1-rc.2',
+  '@deepseek-ai/dsh-client-ui-workspace': '>=0.2.1-rc.2 <0.3.0',
+  '@deepseek-ai/dsh-host-webserver': '>=0.2.1-rc.2 <0.3.0',
   react: '^18.2.0'
 };
 delete pkg.peerDependenciesMeta;
